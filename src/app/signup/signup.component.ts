@@ -5,9 +5,9 @@ import { first } from 'rxjs/operators';
 
 import { AlertService, UserService, AuthenticationService } from '@/_services';
 
-@Component({ templateUrl: 'register.component.html' })
-export class RegisterComponent implements OnInit {
-    registerForm: FormGroup;
+@Component({ templateUrl: 'signup.component.html' })
+export class SignupComponent implements OnInit {
+    signupForm: FormGroup;
     loading = false;
     submitted = false;
 
@@ -25,16 +25,17 @@ export class RegisterComponent implements OnInit {
     }
 
     ngOnInit() {
-        this.registerForm = this.formBuilder.group({
+        this.signupForm = this.formBuilder.group({
             firstName: ['', Validators.required],
             lastName: ['', Validators.required],
-            username: ['', Validators.required],
-            password: ['', [Validators.required, Validators.minLength(6)]]
+            phoneNumber: ['', Validators.required],
+            email: ['', Validators.required],
+            password: ['', [Validators.required]]
         });
     }
 
     // convenience getter for easy access to form fields
-    get f() { return this.registerForm.controls; }
+    get f() { return this.signupForm.controls; }
 
     onSubmit() {
         this.submitted = true;
@@ -43,17 +44,17 @@ export class RegisterComponent implements OnInit {
         this.alertService.clear();
 
         // stop here if form is invalid
-        if (this.registerForm.invalid) {
+        if (this.signupForm.invalid) {
             return;
         }
 
         this.loading = true;
-        this.userService.register(this.registerForm.value)
+        this.userService.signup(this.signupForm.value)
             .pipe(first())
             .subscribe(
                 data => {
-                    this.alertService.success('Registration successful', true);
-                    this.router.navigate(['/login']);
+                    this.alertService.success('Sign Up successful!', true);
+                    this.router.navigate(['/mainfeed']);
                 },
                 error => {
                     this.alertService.error(error);

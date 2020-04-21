@@ -1,15 +1,15 @@
 {
-    "name": "angular-8-registration-login-example",
+    "name": "PicGal",
     "version": "1.0.0",
-    "repository": {
+	"repository": {
         "type": "git",
-        "url": "https://github.com/cornflourblue/angular-8-registration-login-example.git"
+        "url": "https://github.com/cwhizy/PictureGallery.git"
     },
     "scripts": {
         "build": "webpack --mode production",
         "start": "webpack-dev-server --mode development --open"
     },
-    "license": "MIT",
+	"license": "MIT",
     "dependencies": {
         "@angular/common": "^8.0.0",
         "@angular/compiler": "^8.0.0",
@@ -18,6 +18,7 @@
         "@angular/platform-browser": "^8.0.0",
         "@angular/platform-browser-dynamic": "^8.0.0",
         "@angular/router": "^8.0.0",
+        "bootstrap": "^4.4.1",
         "core-js": "^3.1.3",
         "rxjs": "^6.3.3",
         "zone.js": "^0.9.1"

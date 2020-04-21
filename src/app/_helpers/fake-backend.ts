@@ -3,6 +3,7 @@ import { HttpRequest, HttpResponse, HttpHandler, HttpEvent, HttpInterceptor, HTT
 import { Observable, of, throwError } from 'rxjs';
 import { delay, mergeMap, materialize, dematerialize } from 'rxjs/operators';
 
+
 // array in local storage for registered users
 let users = JSON.parse(localStorage.getItem('users')) || [];
 
@@ -20,14 +21,10 @@ export class FakeBackendInterceptor implements HttpInterceptor {
 
         function handleRoute() {
             switch (true) {
-                case url.endsWith('/users/authenticate') && method === 'POST':
+                case url.endsWith('/users/login/') && method === 'POST':
                     return authenticate();
-                case url.endsWith('/users/register') && method === 'POST':
-                    return register();
-                case url.endsWith('/users') && method === 'GET':
-                    return getUsers();
-                case url.match(/\/users\/\d+$/) && method === 'DELETE':
-                    return deleteUser();
+                case url.endsWith('/users/signup/') && method === 'POST':
+                    return signup();                
                 default:
                     // pass through any requests not handled above
                     return next.handle(request);
@@ -37,23 +34,24 @@ export class FakeBackendInterceptor implements HttpInterceptor {
         // route functions
 
         function authenticate() {
-            const { username, password } = body;
-            const user = users.find(x => x.username === username && x.password === password);
-            if (!user) return error('Username or password is incorrect');
+            const { email, password } = body;
+            const user = users.find(x => x.email === email && x.password === password);
+            if (!user) return error('Email or password is incorrect');
             return ok({
                 id: user.id,
                 username: user.username,
                 firstName: user.firstName,
                 lastName: user.lastName,
-                token: 'fake-jwt-token'
+                phoneNumber: user.phoneNumber,
+                token: user.token
             })
         }
 
-        function register() {
+        function signup() {
             const user = body
 
-            if (users.find(x => x.username === user.username)) {
-                return error('Username "' + user.username + '" is already taken')
+            if (users.find(x => x.email === user.email)) {
+                return error('Email "' + user.email + '" is already taken')
             }
 
             user.id = users.length ? Math.max(...users.map(x => x.id)) + 1 : 1;
@@ -62,20 +60,6 @@ export class FakeBackendInterceptor implements HttpInterceptor {
 
             return ok();
         }
-
-        function getUsers() {
-            if (!isLoggedIn()) return unauthorized();
-            return ok(users);
-        }
-
-        function deleteUser() {
-            if (!isLoggedIn()) return unauthorized();
-
-            users = users.filter(x => x.id !== idFromUrl());
-            localStorage.setItem('users', JSON.stringify(users));
-            return ok();
-        }
-
         // helper functions
 
         function ok(body?) {
@@ -92,11 +76,6 @@ export class FakeBackendInterceptor implements HttpInterceptor {
 
         function isLoggedIn() {
             return headers.get('Authorization') === 'Bearer fake-jwt-token';
-        }
-
-        function idFromUrl() {
-            const urlParts = url.split('/');
-            return parseInt(urlParts[urlParts.length - 1]);
         }
     }
 }

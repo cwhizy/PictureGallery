@@ -1,21 +1,29 @@
 ﻿import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 
 import { User } from '@/_models';
 
 @Injectable({ providedIn: 'root' })
 export class UserService {
+
+    // JSON header
+    jsonHeader = new HttpHeaders({'Content-Type': 'application/json'});
+  
     constructor(private http: HttpClient) { }
 
-    getAll() {
-        return this.http.get<User[]>(`${config.apiUrl}/users`);
-    }
+    signup(user: User) {
+        
+        const body = {
+            'email': user.email,
+            'password': user.password,
+            'first_name': user.firstName,
+            'last_name': user.lastName,
+            'phone_number': user.phoneNumber
+        };
 
-    register(user: User) {
-        return this.http.post(`${config.apiUrl}/users/register`, user);
-    }
-
-    delete(id: number) {
-        return this.http.delete(`${config.apiUrl}/users/${id}`);
+        console.log(JSON.stringify(body));
+        
+        return this.http.post(`${config.apiUrl}/users/signup/`, JSON.stringify(body), 
+        {'headers':this.jsonHeader});
     }
 }
